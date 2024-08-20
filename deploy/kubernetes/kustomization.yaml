@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - statefulset.postgres.yaml
   - service.postgres.yaml
+  - job.migration_v1.yaml

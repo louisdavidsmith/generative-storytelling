@@ -1,0 +1,22 @@
+# flyway-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrations
+spec:
+  template:
+    spec:
+      containers:
+      - name: flyway
+        image: datastore-migrations:latest
+        command:
+          - flyway
+        args:
+          -  -url=jdbc:postgresql://postgres:5432/lovecraft
+          -  -defaultSchema=public
+          -  -baselineOnMigrate=true
+          -  -user=lovecraft
+          -  -password=supersecretpassword
+          -  migrate
+      restartPolicy: Never
+  backoffLimit: 10

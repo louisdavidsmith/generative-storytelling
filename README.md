@@ -1,3 +1,10 @@
+## Attribution
+
+This repository includes code from [Original Repository Name](link-to-original-repo), which is licensed under the Apache 2.0 License.
+
+[LICENSE](LICENSE)
+
+
 ctlptl apply -f deploy/ctlptl/cluster.yaml
 
 
