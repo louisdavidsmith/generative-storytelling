@@ -58,7 +58,13 @@ async def split_data(text: str, enc: Encoding, max_tokens: int) -> List[Any]:
     return content
 
 
-async def process(content, encoder, max_token_span, embeddings, batch_size):
+async def process(
+    content: str,
+    encoder: Encoding,
+    max_token_span: int,
+    embeddings: Embeddings,
+    batch_size: int,
+):
     text = await split_data(content, encoder, 512)
     embeddings = await batch_process(text, embeddings, batch_size)
 
