@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package common;
+
+enum CheckOutcome {
+  UNEXPECTED_POSITIVE_OUTCOME = 0;
+  SUCCESSFUL = 1;
+  SUCCESSFUL_WITH_COMPLICATION = 2;
+  FAIL_WITH_BOON = 3;
+  FAIL_SIMPLE = 4;
+  FAIL_WITH_COMPLICATIONS = 5;
+}
+

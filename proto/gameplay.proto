@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package gameplay;
+
+import "common.proto"; // Import the common.proto file
+
+enum RelevantSkill {
+  PHYSICAL = 0;
+  WITT = 1;
+  SOCIAL = 2;
+  COMPOSURE = 3;
+}
+
+// Service to manage chats
+service GameplayService {
+  rpc SelectSkill(SelectSkillRequest) returns (SelectSkillResponse);
+  rpc AssessIfSkillCheck(AssessIfSkillCheckRequest) returns (AssessIfSkillCheckResponse);
+  rpc PerformSkillCheck(PerformSkillCheckRequest) returns (PerformSkillCheckResponse);
+  rpc AssessIfSanityCheck(AssessIfSanityCheckRequest) returns (AssessIfSantiyCheckResponse);
+  rpc PerformSanityCheck(PerformSanityCheckRequest) returns (PerformSanityCheckResponse);
+  rpc AssignSanityLoss(AssignSanityLossRequest) returns (AssignSanityLossResponse);
+}
+
+message SelectSkillRequest {
+  string player_action = 1;
+}
+
+message SelectSkillResponse {
+  RelevantSkill = 1;
+}
+
+message AssessIfSkillCheckRequest {
+  string player_action = 1;
+}
+
+message AssesIfSkillCheckResponse {
+  bool do_skill_check = 1;
+}
+
+message PerformSkillCheckRequest{
+  int32 bonus = 1;
+}
+
+message PerformSkillCheckResponse {
+  common.CheckOutcome check_outcome = 1;
+}
+
+message AssessIfSanityCheckRequest {
+  string game_narration = 1;
+}
+
+message AssessIfSanityCheckResponse {
+  bool do_sanity_check = 1;
+}
+
+message PerformSanityCheckRequest {
+  int32 current_sanity = 1;
+}
+
+message PerformSanityCheckResponse {
+  bool passed_sanity_check = 1;
+}
+
+message AssignSanityLossRequest {
+  string game_narration = 1;
+}
+
+message AssignSanityLossResponse {
+  int32 sanity_loss = 1;
+}
