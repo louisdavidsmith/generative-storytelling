@@ -18,6 +18,8 @@ spec:
            value: "lovecraft"
          - name: USER
            value: "lovecraft"
+         - name: PASSWORD
+           value: "supersecretpassword"
          - name: EMBEDDINGS_URL
            value: "http://text-embeddings-service:3000"
         resources:
