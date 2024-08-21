@@ -12,7 +12,7 @@ spec:
         env:
          - name: LORE_ID
            value: "25ad5d9b-d233-4f97-afc7-6f62ab0cfb37"
-         - name: DB_HOST
+         - name: HOST
            value: "postgres"
          - name: DBNAME
            value: "lovecraft"

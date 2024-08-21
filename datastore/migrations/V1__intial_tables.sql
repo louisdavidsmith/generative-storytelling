@@ -32,12 +32,7 @@ CREATE TABLE IF NOT EXISTS character_stat (
 
 CREATE TABLE IF NOT EXISTS lore (
   lore_id UUID NOT NULL,
-  lore_content_id UUID NOT NULL,
-  content TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS lore_embedding (
-  lore_id UUID NOT NULL,
-  lore_content_id UUID NOT NULL,
-  embedding VECTOR(768)
+  lore_content_id UUID NOT NULL DEFAULT gen_random_uuid(),
+  embedding VECTOR(768) NOT NULL,
+  content text NOT NULL
 );
