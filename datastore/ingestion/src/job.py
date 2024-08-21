@@ -96,6 +96,7 @@ async def main(args: argparse.Namespace):
             )
         )
     await asyncio.gather(*tasks)
+    logger.info("DataIngested")
 
 
 if __name__ == "__main__":
