@@ -10,7 +10,6 @@ import (
 	pb "prompt/pkg/proto/prompt" // Adjust this path according to your setup
 )
 
-// server is used to implement pb.PromptServiceServer.
 type server struct {
 	pb.UnimplementedPromptServiceServer
 }
@@ -33,13 +32,6 @@ func (s *server) GetNarrationPrompt(ctx context.Context, req *pb.GetNarrationPro
 		Role:    pb.Role_SYSTEM,
 	}
 
-	var last10ChatHistory []*pb.Chat
-	if len(req.ChatHistory) > 10 {
-		last10ChatHistory = req.ChatHistory[len(req.ChatHistory)-10:]
-	} else {
-		last10ChatHistory = req.ChatHistory
-	}
-
 	userPrompt := `MYTHOS_SETTING: %s | USER_INPUT %s`
 	formattedUserPrompt := fmt.Sprintf(userPrompt, req.LoreContext, req.UserInput)
 	userChat := &pb.Chat{
@@ -47,37 +39,51 @@ func (s *server) GetNarrationPrompt(ctx context.Context, req *pb.GetNarrationPro
 		Role:    pb.Role_USER,
 	}
 	prompt := &pb.Prompt{
-		Prompt: append([]*pb.Chat{systemChat}, append(last10ChatHistory, userChat)...),
+		Prompt: append([]*pb.Chat{systemChat}, append(req.ChatHistory, userChat)...),
 	}
 
 	return prompt, nil
 }
 
 func (s *server) GetSkillCheckResolutionPrompt(ctx context.Context, req *pb.GetSkillCheckResolutionPromptRequest) (*pb.Prompt, error) {
-	// Implement the logic for handling the GetSkillCheckResolutionPrompt request.
-	// For demonstration, let's just create a simple response.
-	prompt := &pb.Prompt{
-		Prompt: []*pb.Chat{
-			{
-				Content: "This is a skill check resolution prompt based on the check outcome.",
-				Role:    pb.Role_ASSISTANT,
-			},
-		},
+	skillCheckPrompt := `You are a subsystem for a lovecraftian
+                   role-playing game. When the player is exploring the world,
+                   they will at times take actions that must be resolved via a
+                   skill check. Your purpose is to take the player action and
+                   the result of the skill check and provide a short narration
+                   to resolve the action according to the skill check.
+		   Check Result %s | User Action %s`
+	formattedSkillPrompt := fmt.Sprintf(skillCheckPrompt, req.CheckOutcome, req.UserInput)
+	skillChat := &pb.Chat{
+		Content: formattedSkillPrompt,
+		Role:    pb.Role_USER,
 	}
 
+	prompt := &pb.Prompt{
+		Prompt: append(req.ChatHistory, skillChat),
+	}
 	return prompt, nil
 }
 
 func (s *server) GetInsanityNarration(ctx context.Context, req *pb.GetSanityNarrationRequest) (*pb.Prompt, error) {
-	// Implement the logic for handling the GetInsanityNarration request.
-	// For demonstration, let's just create a simple response.
+	sanityPrompt := `You are a subsystem for a lovecraftian role-playing game.
+		When a player encounters horrifying and eldritch powers beyond human
+		comprehension, they must undergo a sanity check. If a player fails
+		that check, your subsystem will take the current context of the adventure,
+		setting information from the lovecraftian mythos, and write a scene that
+		describes a temporary and transient bout of madness. When completing a request
+		modulate the intensity of your response based on the severity of the situation,
+		and the nature of the threat. When responding do not refer to yourself or have any
+		asides, merely continue the narrative with a bout of madness. MYTHOS: %s | USER INPUT %s`
+
+	formattedSanityPrompt := fmt.Sprintf(sanityPrompt, req.LoreContent, req.UserInput)
+	sanityChat := &pb.Chat{
+		Content: formattedSanityPrompt,
+		Role:    pb.Role_USER,
+	}
+
 	prompt := &pb.Prompt{
-		Prompt: []*pb.Chat{
-			{
-				Content: "This is an insanity narration prompt based on the current sanity level.",
-				Role:    pb.Role_ASSISTANT,
-			},
-		},
+		Prompt: append(req.ChatHistory, sanityChat),
 	}
 
 	return prompt, nil
