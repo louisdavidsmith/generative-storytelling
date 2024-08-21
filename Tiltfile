@@ -20,6 +20,12 @@ k8s_resource(
   labels='datastore'
 )
 
+k8s_resource(
+  workload="minio",
+  port_forwards='9001:9001',
+  labels='datastore'
+)
+
 # ingest lore
 
 docker_build(
@@ -33,6 +39,22 @@ k8s_resource(
   labels="datastore",
   resource_deps=["postgres", "db-migrations", "text-embeddings-deployment"]
 )
+
+
+# narrative
+
+docker_build(
+'narrative-prompt',
+'.',
+dockerfile='deploy/docker/Dockerfile.narrative.prompt'
+)
+
+k8s_resource(
+  workload='narrative-prompt',
+  labels='narrative',
+  port_forwards=["50051:50051"]
+)
+
 # embeddings
 
 k8s_resource(

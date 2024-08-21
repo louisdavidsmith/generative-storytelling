@@ -2,36 +2,38 @@ syntax = "proto3";
 
 package prompt;
 
+option go_package = "proto/prompt";
 
-import "common.proto"; // Import the common.proto file
+import "proto/common.proto"; // Import the common.proto file
 
 enum Role {
-  USER = 1;
-  ASSISTANT = 2;
-  SYSTEM = 3;
+  USER = 0;
+  ASSISTANT = 1;
+  SYSTEM = 2;
 }
 
 enum CurrentSanity {
-  LOW = 1;
-  MEDIUM = 2;
-  HIGH = 3;
+  LOW = 0;
+  MEDIUM = 1;
+  HIGH = 2;
 }
 // Service to manage chats
 service PromptService {
-  GetNarrationPrompt(GetNarrationPromptRequest) returns (Prompt);
-  GetSkillCheckResolutionPrompt(GetSkillCheckResolutionPromptRequest) returns (Prompt);
-  GetInsanityNarration(GetSanityNarrationRequest) returns (Prompt);
+  rpc GetNarrationPrompt(GetNarrationPromptRequest) returns (Prompt);
+  rpc GetSkillCheckResolutionPrompt(GetSkillCheckResolutionPromptRequest) returns (Prompt);
+  rpc GetInsanityNarration(GetSanityNarrationRequest) returns (Prompt);
 }
 
 message Chat {
   string content = 1;
-  ROLE role = 2;
+  Role role = 2;
 }
 
 message GetNarrationPromptRequest {
   string lore_context = 1;
   string game_state = 2;
-  repeated Chat chat_history = 3;
+  string user_input = 3;
+  repeated Chat chat_history = 4;
 }
 
 message Prompt {
@@ -40,11 +42,13 @@ message Prompt {
 
 message GetSkillCheckResolutionPromptRequest {
   common.CheckOutcome check_outcome = 1;
-  repeated Chat chat_history = 2;
+  string user_input = 2;
+  repeated Chat chat_history = 3;
 }
 
 message GetSanityNarrationRequest {
   CurrentSanity current_sanity = 1;
-  string lore_content = 2;
-  repeated Chat chat_history = 3;
+  string user_input = 2;
+  string lore_content = 3;
+  repeated Chat chat_history = 4;
 }

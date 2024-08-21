@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package common;
+option go_package = "proto/common";
 
 enum CheckOutcome {
   UNEXPECTED_POSITIVE_OUTCOME = 0;
@@ -10,4 +11,3 @@ enum CheckOutcome {
   FAIL_SIMPLE = 4;
   FAIL_WITH_COMPLICATIONS = 5;
 }
-

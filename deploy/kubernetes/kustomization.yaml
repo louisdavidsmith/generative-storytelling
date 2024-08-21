@@ -4,7 +4,9 @@ resources:
   - statefulset.postgres.yaml
   - service.postgres.yaml
   - service.text-embeddings.yaml
+  - service.narrative-prompt.yaml
   - deployment.text-embeddings.yaml
+  - deployment.narrative-prompt.yaml
   - deployment.minio.yaml
   - job.migration_v1.yaml
   - job.lore_initial.yaml

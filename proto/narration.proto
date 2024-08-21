@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package narration;
+
+option go_package = "proto/narration";
+
+// Service to manage chats
+service PromptService {
+  rpc GenerateResponseStream(GenerateResponseStreamRequest) returns (stream StreamResponse);
+  rpc GenerateRepsonseBatch(GenerateResponseBatchRequest) returns (BatchResponse);
+}
+
+message StreamResponse {
+  string token = 1;
+}
+
+message BatchResponse {
+  string response = 2;
+}

@@ -1,0 +1,28 @@
+FROM golang:1.23 as builder
+
+WORKDIR /app
+
+COPY narrative/prompt/go.mod .
+COPY narrative/prompt/go.sum .
+
+RUN go mod download
+
+COPY narrative/prompt/pkg ./pkg
+
+COPY narrative/prompt/cmd ./cmd
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd
+
+#Start a new stage from scratch
+FROM alpine:latest
+
+WORKDIR /root/
+
+COPY --from=builder /app/server ./server
+
+# Make the binary executable
+RUN chmod +x ./server
+
+EXPOSE 50051
+
+RUN ls
