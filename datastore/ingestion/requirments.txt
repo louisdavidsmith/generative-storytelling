@@ -1,0 +1,6 @@
+gitpython
+httpx
+psycopg[binary,pool]
+structlog
+tiktoken
+tenacity
