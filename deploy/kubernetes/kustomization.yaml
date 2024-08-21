@@ -3,4 +3,7 @@ kind: Kustomization
 resources:
   - statefulset.postgres.yaml
   - service.postgres.yaml
+  - service.text-embeddings.yaml
+  - deployment.text-embeddings.yaml
   - job.migration_v1.yaml
+  - job.lore_initial.yaml
