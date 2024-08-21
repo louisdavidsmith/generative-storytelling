@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lore-initial-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: lore-initial-container
+        image: datastore-ingestion:latest
+        command: ["python", "src/job.py"]
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+      restartPolicy: OnFailure
+  backoffLimit: 4
