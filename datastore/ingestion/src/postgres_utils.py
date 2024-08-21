@@ -1,8 +1,10 @@
-import psycopg_pool
 import asyncio
-from typing import List
 import json
 import uuid
+from typing import List
+
+import psycopg_pool
+from tenacity import retry, wait_exponential
 
 
 async def get_conn(host: str, dbname: str, user: str, max_size=10):
@@ -13,6 +15,7 @@ async def get_conn(host: str, dbname: str, user: str, max_size=10):
     return pool
 
 
+@retry(wait=wait_exponential(multiplier=1, min=4, max=10))
 async def write_embeddings(
     pool: psycopg_pool.AsyncConnectionPool,
     embeddings: List[List[float]],
@@ -28,7 +31,6 @@ async def write_embeddings(
         (lore_id, json.dumps(embedding), record)
         for embedding, record in zip(embeddings, content)
     ]
-    print(data)
     async with pool.connection() as conn:
         async with conn.cursor() as cursor:
             await cursor.executemany(query, data, returning=False)

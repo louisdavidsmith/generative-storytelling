@@ -1,13 +1,13 @@
-from git import Repo
-from structlog import get_logger
-import os
-from typing import Iterable, List, Any
-from embeddings import Embeddings
-from postgres_utils import get_conn, write_embeddings
 import asyncio
-import tiktoken
-from tiktoken.core import Encoding
+import os
+from typing import Any, Iterable, List
 
+import tiktoken
+from git import Repo
+from src.embeddings import Embeddings
+from src.postgres_utils import get_conn, write_embeddings
+from structlog import get_logger
+from tiktoken.core import Encoding
 
 logger = get_logger("lore-ingestion")
 
@@ -71,7 +71,8 @@ async def process(
 ):
     text = await split_data(content, encoder, 512)
     embeddings = await batch_process(text, embeddings, batch_size)
-    await write_embeddings(pool, embeddings, content)
+    await write_embeddings(pool, embeddings, text, lore_id)
+    logger.info("DataIngested", n_records=len(text))
 
 
 async def main():
