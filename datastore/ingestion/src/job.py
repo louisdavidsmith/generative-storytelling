@@ -1,6 +1,7 @@
+import argparse
 import asyncio
 import os
-from typing import Any, Iterable, List
+from typing import Any, Coroutine, Iterable, List
 
 import tiktoken
 from git import Repo
@@ -75,17 +76,44 @@ async def process(
     logger.info("DataIngested", n_records=len(text))
 
 
-async def main():
-    lore_id = "b81e872e-1bc7-4e68-a531-cf76bbb13336"
-    embeddings = Embeddings("http://127.0.0.1:3000")
+async def main(args: argparse.Namespace):
+    embeddings = Embeddings(args.embeddings_url)
     encoder = tiktoken.get_encoding("o200k_base")
-    pool = await get_conn("localhost", "lovecraft", "lovecraft")
+    pool = await get_conn(args.host, args.dbname, args.user)
     get_data("data")
     data_generator = get_data_generator("data")
-    tasks = []
+    tasks: List[Coroutine[Any, Any, Any]] = []
     for content in data_generator:
-        tasks.append(process(content, encoder, 512, embeddings, 10, pool, lore_id))
+        tasks.append(
+            process(
+                content,
+                encoder,
+                args.max_tokens,
+                embeddings,
+                args.batch_size,
+                pool,
+                args.lore_id,
+            )
+        )
     await asyncio.gather(*tasks)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process data with embeddings.")
+    parser.add_argument("--lore_id", type=str, default=os.getenv("LORE_ID", ""))
+    parser.add_argument(
+        "--embeddings_url", type=str, default=os.getenv("EMBEDDINGS_URL", "")
+    )
+    parser.add_argument("--host", type=str, default=os.getenv("HOST", ""))
+    parser.add_argument("--dbname", type=str, default=os.getenv("DBNAME", ""))
+    parser.add_argument("--user", type=str, default=os.getenv("USER", ""))
+    parser.add_argument(
+        "--batch_size", type=int, default=int(os.getenv("BATCH_SIZE", "10"))
+    )
+    parser.add_argument(
+        "--max_tokens", type=int, default=int(os.getenv("MAX_TOKENS", "512"))
+    )
+
+    args = parser.parse_args()
+
+    asyncio.run(main(args))
