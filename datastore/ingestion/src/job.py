@@ -79,7 +79,12 @@ async def process(
 async def main(args: argparse.Namespace):
     embeddings = Embeddings(args.embeddings_url)
     encoder = tiktoken.get_encoding("o200k_base")
-    pool = await get_conn(args.host, args.dbname, args.user)
+    pool = await get_conn(
+        args.host,
+        args.dbname,
+        args.user,
+        args.password,
+    )
     get_data("data")
     data_generator = get_data_generator("data")
     tasks: List[Coroutine[Any, Any, Any]] = []
@@ -108,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--host", type=str, default=os.getenv("HOST", ""))
     parser.add_argument("--dbname", type=str, default=os.getenv("DBNAME", ""))
     parser.add_argument("--user", type=str, default=os.getenv("USER", ""))
+    parser.add_argument("--password", type=str, default=os.getenv("PASSWORD", ""))
     parser.add_argument(
         "--batch_size", type=int, default=int(os.getenv("BATCH_SIZE", "10"))
     )

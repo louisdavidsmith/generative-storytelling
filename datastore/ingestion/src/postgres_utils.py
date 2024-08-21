@@ -4,11 +4,17 @@ import uuid
 from typing import List
 
 import psycopg_pool
+from structlog import get_logger
 from tenacity import retry, wait_exponential
 
+logger = get_logger("ps-utils")
 
-async def get_conn(host: str, dbname: str, user: str, max_size=10):
-    conn_info = f"host={host}, dbname={dbname} user={user}"
+
+async def get_conn(
+    host: str, dbname: str, user: str, password: str, max_size: int = 10
+) -> psycopg_pool.AsyncConnectionPool:
+    conn_info = f"host={host} dbname={dbname} user={user} password={password}"
+    logger.info("ConnInfo", conn_info=conn_info)
     pool = psycopg_pool.AsyncConnectionPool(
         conninfo=conn_info, open=False, max_size=max_size
     )
