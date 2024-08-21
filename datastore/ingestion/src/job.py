@@ -3,9 +3,11 @@ from structlog import get_logger
 import os
 from typing import Iterable, List, Any
 from embeddings import Embeddings
+from postgres_utils import get_conn, write_embeddings
 import asyncio
 import tiktoken
 from tiktoken.core import Encoding
+
 
 logger = get_logger("lore-ingestion")
 
@@ -64,19 +66,24 @@ async def process(
     max_token_span: int,
     embeddings: Embeddings,
     batch_size: int,
+    pool,
+    lore_id: str,
 ):
     text = await split_data(content, encoder, 512)
     embeddings = await batch_process(text, embeddings, batch_size)
+    await write_embeddings(pool, embeddings, content)
 
 
 async def main():
+    lore_id = "b81e872e-1bc7-4e68-a531-cf76bbb13336"
     embeddings = Embeddings("http://127.0.0.1:3000")
     encoder = tiktoken.get_encoding("o200k_base")
+    pool = await get_conn("localhost", "lovecraft", "lovecraft")
     get_data("data")
     data_generator = get_data_generator("data")
     tasks = []
     for content in data_generator:
-        tasks.append(process(content, encoder, 512, embeddings, 10))
+        tasks.append(process(content, encoder, 512, embeddings, 10, pool, lore_id))
     await asyncio.gather(*tasks)
 
 
