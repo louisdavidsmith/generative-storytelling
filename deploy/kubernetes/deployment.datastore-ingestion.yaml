@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datastore-ingestion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datastore-ingestion
+  template:
+    metadata:
+      labels:
+        app: datastore-ingestion
+    spec:
+      containers:
+      - name: datastore-ingestion-container
+        image: datastore-ingestion:latest
+        command: ["python", "src/job.py"]
+        env:
+         - name: HOST
+           value: "postgres"
+         - name: DBNAME
+           value: "roleplaying"
+         - name: USER
+           value: "roleplaying"
+         - name: PASSWORD
+           value: "supersecretpassword"
+         - name: EMBEDDINGS_URL
+           value: "http://text-embeddings-service:3000"
+         - name: AMQP_URL
+           value: "amqp://rabbitmq:5672"
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+      restartPolicy: Always

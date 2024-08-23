@@ -3,12 +3,12 @@ kind: Service
 metadata:
   name: postgres
   labels:
-    system: lovecraft
+    system: rollplaying
     subsystem: datastore
     component: persistence
 spec:
   selector:
-    system: lovecraft
+    system: roleplaying
     subsystem: datastore
     component: persistence
   ports:

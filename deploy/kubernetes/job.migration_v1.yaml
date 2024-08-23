@@ -12,10 +12,10 @@ spec:
         command:
           - flyway
         args:
-          -  -url=jdbc:postgresql://postgres:5432/lovecraft
+          -  -url=jdbc:postgresql://postgres:5432/roleplaying
           -  -defaultSchema=public
           -  -baselineOnMigrate=true
-          -  -user=lovecraft
+          -  -user=roleplaying
           -  -password=supersecretpassword
           -  migrate
       restartPolicy: Never

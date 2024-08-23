@@ -5,20 +5,20 @@ metadata:
   labels:
     component: persistence
     subsystem: datastore
-    system: lovecraft
+    system: rollplaying
 spec:
   selector:
     matchLabels:
       component: persistence
       subsystem: datastore
-      system: lovecraft
+      system: roleplaying
   serviceName: postgres
   template:
     metadata:
       labels:
         component: persistence
         subsystem: datastore
-        system: lovecraft
+        system: roleplaying
     spec:
       containers:
       - name: postgres
@@ -27,11 +27,11 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_USER
-          value: lovecraft
+          value: roleplaying
         - name: POSTGRES_PASSWORD
           value: supersecretpassword
         - name: POSTGRES_DB
-          value: lovecraft
+          value: roleplaying
         volumeMounts:
         - name: pvc
           mountPath: /var/lib/postgresql/data
