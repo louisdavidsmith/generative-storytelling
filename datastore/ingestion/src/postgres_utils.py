@@ -32,7 +32,9 @@ async def write_embeddings(
     await pool.wait()
     query = """
         INSERT INTO lore(lore_id, embedding, content)
-        VALUES (%s, %s, %s)"""
+        VALUES(%s, %s, %s)
+        ON CONFLICT (lore_id, embedding) DO NOTHING;
+    """
     data = [
         (lore_id, json.dumps(embedding), record)
         for embedding, record in zip(embeddings, content)

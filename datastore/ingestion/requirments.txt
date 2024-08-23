@@ -1,6 +1,10 @@
+aio_pika
 gitpython
 httpx
+minio
 psycopg[binary,pool]
+pydantic
+polars
 structlog
 tiktoken
 tenacity
