@@ -32,7 +32,9 @@ def get_data_generator(
         yield df["content"].to_list()[0]
 
 
-async def batch_process(inputs: List[str], embeddings: Embeddings, batch_size: int):
+async def batch_process(
+    inputs: List[str], embeddings: Embeddings, batch_size: int
+) -> List[List[float]]:
     tasks = []
     for i in range(0, len(inputs), batch_size):
         batch = inputs[i : i + batch_size]
@@ -43,7 +45,7 @@ async def batch_process(inputs: List[str], embeddings: Embeddings, batch_size: i
     return flat_results
 
 
-async def split_data(text: str, enc: Encoding, max_tokens: int) -> List[Any]:
+async def split_data(text: str, enc: Encoding, max_tokens: int) -> List[str]:
     tokens = enc.encode(text)
     content = []
     token_num = 0

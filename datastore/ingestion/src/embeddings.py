@@ -2,8 +2,8 @@ import logging
 
 import httpx
 from structlog import get_logger
-from tenacity import (before_sleep_log, retry, stop_after_attempt,
-                      wait_exponential)
+from tenacity import before_sleep_log, retry, stop_after_attempt, wait_exponential
+from typing import List
 
 logger = get_logger("embeddings")
 
@@ -18,7 +18,7 @@ class Embeddings:
         stop=stop_after_attempt(4),
         before_sleep=before_sleep_log(logger, logging.INFO),
     )
-    async def embed(self, inputs):
+    async def embed(self, inputs: List[str]) -> List[List[float]]:
         data = {"inputs": inputs}
         url = f"{self.base_url}/embed"
         response = await self.client.post(url, json=data)

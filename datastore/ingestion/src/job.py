@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import json
 import os
-from typing import Any, Coroutine, List
+from typing import Any, Coroutine, List, Tuple
 
 import aio_pika
 import tiktoken
@@ -23,12 +23,11 @@ async def process(
     max_token_span: int,
     embeddings: Embeddings,
     batch_size: int,
-    pool,
     lore_id: str,
-):
+) -> Tuple[List[str], List[List[float]]]:
     text = await split_data(content, encoder, max_token_span)
-    embeddings = await batch_process(text, embeddings, batch_size)
-    return text, embeddings
+    embedded_content = await batch_process(text, embeddings, batch_size)
+    return text, embedded_content
 
 
 async def main(args: argparse.Namespace):
@@ -80,12 +79,19 @@ async def main(args: argparse.Namespace):
                         args.max_tokens,
                         embeddings,
                         args.batch_size,
-                        pool,
                         args.lore_id,
                     )
                 )
-            content, embeddings = await asyncio.gather(*tasks)
-            await write_embeddings(pool, embeddings, content, queue_message.lore_id)
+            out = await asyncio.gather(*tasks)
+            logger.info("DataScored")
+            embeded_lore = []
+            lore_content = []
+            for batch in out:
+                lore_content.extend(batch[0])
+                embeded_lore.extend(batch[1])
+            await write_embeddings(
+                pool, embeded_lore, lore_content, queue_message.lore_id
+            )
             logger.info("DataIngested")
 
     await queue.consume(process_message, no_ack=False)

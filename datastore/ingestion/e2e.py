@@ -16,7 +16,7 @@ async def main() -> None:
         message = json.dumps(
             {
                 "bucket": "ingestion",
-                "key": "staging/data.parquet",
+                "key": "data.parquet",
                 "n_rows": 67,
                 "lore_id": "be846c26-8889-4ca6-9eab-cc867501ad22",
             }
