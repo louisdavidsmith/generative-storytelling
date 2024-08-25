@@ -2,14 +2,14 @@ FROM golang:1.23 as builder
 
 WORKDIR /app
 
-COPY narrative/prompt/go.mod .
-COPY narrative/prompt/go.sum .
+COPY narrative/generation/go.mod .
+COPY narrative/generation/go.sum .
 
 RUN go mod download
 
-COPY narrative/prompt/pkg ./pkg
+COPY narrative/generation/pkg ./pkg
 
-COPY narrative/prompt/cmd ./cmd
+COPY narrative/generation/cmd ./cmd
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd
 
@@ -23,4 +23,4 @@ COPY --from=builder /app/server ./server
 # Make the binary executable
 RUN chmod +x ./server
 
-EXPOSE 50051
+EXPOSE 50052
