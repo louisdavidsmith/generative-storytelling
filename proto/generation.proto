@@ -10,7 +10,7 @@ enum Role {
   SYSTEM = 2;
 }
 
-service PromptService {
+service GenerationService {
   rpc GenerateResponseStream(GenerateResponseRequest) returns (stream StreamResponse);
   rpc GenerateRepsonseBatch(GenerateResponseRequest) returns (BatchResponse);
 }

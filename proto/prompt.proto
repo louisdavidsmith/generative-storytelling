@@ -17,7 +17,7 @@ enum CurrentSanity {
   MEDIUM = 1;
   HIGH = 2;
 }
-// Service to manage chats
+
 service PromptService {
   rpc GetNarrationPrompt(GetNarrationPromptRequest) returns (Prompt);
   rpc GetSkillCheckResolutionPrompt(GetSkillCheckResolutionPromptRequest) returns (Prompt);
@@ -30,9 +30,10 @@ message Chat {
 }
 
 message GetNarrationPromptRequest {
-  string game_state = 3;
-  string user_input = 4;
-  repeated Chat chat_history = 5;
+  string lore_context = 1;
+  string game_state = 2;
+  string user_input = 3;
+  repeated Chat chat_history = 4;
 }
 
 message Prompt {
@@ -41,12 +42,13 @@ message Prompt {
 
 message GetSkillCheckResolutionPromptRequest {
   common.CheckOutcome check_outcome = 1;
-  string user_input = 3;
-  repeated Chat chat_history = 4;
+  string user_input = 2;
+  repeated Chat chat_history = 3;
 }
 
 message GetSanityNarrationRequest {
   CurrentSanity current_sanity = 1;
-  string user_input = 3;
-  repeated Chat chat_history = 5;
+  string user_input = 2;
+  string lore_content = 3;
+  repeated Chat chat_history = 4;
 }
