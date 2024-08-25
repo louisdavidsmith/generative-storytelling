@@ -6,12 +6,41 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"strconv"
 
-	pb "prompt/pkg/proto/prompt" // Adjust this path according to your setup
+	pb "prompt/pkg/proto/prompt"
 )
+
+type Config struct {
+	NarrativePromptPort          int
+	MaxConversationHistoryTokens int
+}
 
 type server struct {
 	pb.UnimplementedPromptServiceServer
+	Config *Config
+}
+
+func LoadConfig() (*Config, error) {
+	PromptPortStr := os.Getenv("NARRATIVE_PROMPT_PORT")
+	PromptPort, err := strconv.Atoi(PromptPortStr)
+
+	if err != nil {
+		return nil, fmt.Errorf("NARRATIVE_PROMPT_PORT environment variable not set or not an integer")
+	}
+
+	MaxTokensStr := os.Getenv("MAX_CONVESATION_HISTORY_TOKENS")
+	MaxTokens, err := strconv.Atoi(MaxTokensStr)
+	if err != nil {
+		return nil, fmt.Errorf("MAX_CONVESATION_HISTORY_TOKENS environment variable not set or not an integer")
+	}
+	config := &Config{
+		NarrativePromptPort:          PromptPort,
+		MaxConversationHistoryTokens: MaxTokens,
+	}
+
+	return config, nil
 }
 
 func (s *server) GetNarrationPrompt(ctx context.Context, req *pb.GetNarrationPromptRequest) (*pb.Prompt, error) {
@@ -95,7 +124,8 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterPromptServiceServer(s, &server{})
+	config, _ := LoadConfig()
+	pb.RegisterPromptServiceServer(s, &server{Config: config})
 
 	log.Printf("Server is running on port 50051")
 	if err := s.Serve(lis); err != nil {
