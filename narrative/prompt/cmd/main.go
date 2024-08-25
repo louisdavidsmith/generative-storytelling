@@ -14,7 +14,6 @@ import (
 )
 
 type Config struct {
-	NarrativePromptPort          int
 	MaxConversationHistoryTokens int
 }
 
@@ -24,20 +23,12 @@ type server struct {
 }
 
 func LoadConfig() (*Config, error) {
-	promptPortStr := os.Getenv("NARRATIVE_PROMPT_PORT")
-	promptPort, err := strconv.Atoi(promptPortStr)
-
-	if err != nil {
-		return nil, fmt.Errorf("NARRATIVE_PROMPT_PORT environment variable not set or not an integer")
-	}
-
 	maxTokensStr := os.Getenv("MAX_CONVESATION_HISTORY_TOKENS")
 	maxTokens, err := strconv.Atoi(maxTokensStr)
 	if err != nil {
 		return nil, fmt.Errorf("MAX_CONVESATION_HISTORY_TOKENS environment variable not set or not an integer")
 	}
 	config := &Config{
-		NarrativePromptPort:          promptPort,
 		MaxConversationHistoryTokens: maxTokens,
 	}
 
@@ -129,6 +120,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	config, _ := LoadConfig()
+	log.Printf("Config Loaded")
 	pb.RegisterPromptServiceServer(s, &server{Config: config})
 
 	log.Printf("Server is running on port 50051")

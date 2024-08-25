@@ -21,13 +21,27 @@ func main() {
 
 	client := pb.NewPromptServiceClient(conn)
 
-	// Create a request
-	req := &pb.GetNarrationPromptRequest{
-		GameState:   "Your game state information here",
-		LoreContext: "Your mythos setting information here",
-		UserInput:   "Your user input here",
-		ChatHistory: []*pb.Chat{}, // Provide chat history if needed
-	}
+	chat1 := &pb.Chat{
+        Content: "Hello, how are you?",
+        Role:    pb.Role_USER,
+    	}
+
+    	chat2 := &pb.Chat{
+        	Content: "I'm good, thanks! How about you?",
+        	Role:    pb.Role_ASSISTANT,
+    	}
+
+    	chat3 := &pb.Chat{
+        	Content: "I'm doing well too!",
+       		Role:    pb.Role_USER,
+    	}
+
+    	req := &pb.GetNarrationPromptRequest{
+        	GameState:   "Your game state information here",
+        	LoreContext: "Your mythos setting information here",
+        	UserInput:   "Your user input here",
+        	ChatHistory: []*pb.Chat{chat1, chat2, chat3}, // Add the chat history
+    	}
 
 	// Set a deadline to the context, to avoid waiting indefinitely
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
