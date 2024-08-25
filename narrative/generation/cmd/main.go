@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
 	"net"
 	"os"
 
-	"google.golang.org/grpc"
-	pb "generation/pkg/proto/generation"
 	"generation/pkg/dummy"
+	"generation/pkg/generation"
+	m "generation/pkg/mistral"
+	pb "generation/pkg/proto/generation"
 	"github.com/gage-technologies/mistral-go"
-	"generation/pkg/mistral"
+	"google.golang.org/grpc"
 )
 
 type GenerationServiceServer struct {
@@ -28,20 +28,21 @@ func (s *GenerationServiceServer) GenerateResponseBatch(ctx context.Context, req
 }
 
 func main() {
-	generatorType := flag.String("generator", "dummy", "The type of generator to use (dummy, mistral)")
-	flag.Parse()
-
+	generatorType := os.Getenv("GENERATOR_TYPE")
+	if generatorType == "" {
+		generatorType = "dummy"
+	}
 	var generator generation.Generator
 
-	switch *generatorType {
+	switch generatorType {
 	case "dummy":
 		generator = dummy.NewDummyGenerator()
 	case "mistral":
-		mistralClient := mistral.NewMistralClientDefault()
+		mistralClient := mistral.NewMistralClientDefault("password")
 		modelId := os.Getenv("MISTRAL_MODEL_ID")
-		generator = mistral.NewMistralGenerator(mistralClient, modelId)
+		generator = m.NewMistralGenerator(mistralClient, modelId)
 	default:
-		log.Fatalf("Unsupported generator type: %s", *generatorType)
+		log.Fatalf("Unsupported generator type: %s", generatorType)
 	}
 
 	lis, err := net.Listen("tcp", ":50052")

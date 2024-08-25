@@ -19,29 +19,29 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PromptService_GenerateResponseStream_FullMethodName = "/generation.PromptService/GenerateResponseStream"
-	PromptService_GenerateRepsonseBatch_FullMethodName  = "/generation.PromptService/GenerateRepsonseBatch"
+	GenerationService_GenerateResponseStream_FullMethodName = "/generation.GenerationService/GenerateResponseStream"
+	GenerationService_GenerateRepsonseBatch_FullMethodName  = "/generation.GenerationService/GenerateRepsonseBatch"
 )
 
-// PromptServiceClient is the client API for PromptService service.
+// GenerationServiceClient is the client API for GenerationService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PromptServiceClient interface {
+type GenerationServiceClient interface {
 	GenerateResponseStream(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamResponse], error)
 	GenerateRepsonseBatch(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (*BatchResponse, error)
 }
 
-type promptServiceClient struct {
+type generationServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPromptServiceClient(cc grpc.ClientConnInterface) PromptServiceClient {
-	return &promptServiceClient{cc}
+func NewGenerationServiceClient(cc grpc.ClientConnInterface) GenerationServiceClient {
+	return &generationServiceClient{cc}
 }
 
-func (c *promptServiceClient) GenerateResponseStream(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamResponse], error) {
+func (c *generationServiceClient) GenerateResponseStream(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PromptService_ServiceDesc.Streams[0], PromptService_GenerateResponseStream_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &GenerationService_ServiceDesc.Streams[0], GenerationService_GenerateResponseStream_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,106 +56,106 @@ func (c *promptServiceClient) GenerateResponseStream(ctx context.Context, in *Ge
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PromptService_GenerateResponseStreamClient = grpc.ServerStreamingClient[StreamResponse]
+type GenerationService_GenerateResponseStreamClient = grpc.ServerStreamingClient[StreamResponse]
 
-func (c *promptServiceClient) GenerateRepsonseBatch(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (*BatchResponse, error) {
+func (c *generationServiceClient) GenerateRepsonseBatch(ctx context.Context, in *GenerateResponseRequest, opts ...grpc.CallOption) (*BatchResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BatchResponse)
-	err := c.cc.Invoke(ctx, PromptService_GenerateRepsonseBatch_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GenerationService_GenerateRepsonseBatch_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PromptServiceServer is the server API for PromptService service.
-// All implementations must embed UnimplementedPromptServiceServer
+// GenerationServiceServer is the server API for GenerationService service.
+// All implementations must embed UnimplementedGenerationServiceServer
 // for forward compatibility.
-type PromptServiceServer interface {
+type GenerationServiceServer interface {
 	GenerateResponseStream(*GenerateResponseRequest, grpc.ServerStreamingServer[StreamResponse]) error
 	GenerateRepsonseBatch(context.Context, *GenerateResponseRequest) (*BatchResponse, error)
-	mustEmbedUnimplementedPromptServiceServer()
+	mustEmbedUnimplementedGenerationServiceServer()
 }
 
-// UnimplementedPromptServiceServer must be embedded to have
+// UnimplementedGenerationServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPromptServiceServer struct{}
+type UnimplementedGenerationServiceServer struct{}
 
-func (UnimplementedPromptServiceServer) GenerateResponseStream(*GenerateResponseRequest, grpc.ServerStreamingServer[StreamResponse]) error {
+func (UnimplementedGenerationServiceServer) GenerateResponseStream(*GenerateResponseRequest, grpc.ServerStreamingServer[StreamResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method GenerateResponseStream not implemented")
 }
-func (UnimplementedPromptServiceServer) GenerateRepsonseBatch(context.Context, *GenerateResponseRequest) (*BatchResponse, error) {
+func (UnimplementedGenerationServiceServer) GenerateRepsonseBatch(context.Context, *GenerateResponseRequest) (*BatchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateRepsonseBatch not implemented")
 }
-func (UnimplementedPromptServiceServer) mustEmbedUnimplementedPromptServiceServer() {}
-func (UnimplementedPromptServiceServer) testEmbeddedByValue()                       {}
+func (UnimplementedGenerationServiceServer) mustEmbedUnimplementedGenerationServiceServer() {}
+func (UnimplementedGenerationServiceServer) testEmbeddedByValue()                           {}
 
-// UnsafePromptServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PromptServiceServer will
+// UnsafeGenerationServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GenerationServiceServer will
 // result in compilation errors.
-type UnsafePromptServiceServer interface {
-	mustEmbedUnimplementedPromptServiceServer()
+type UnsafeGenerationServiceServer interface {
+	mustEmbedUnimplementedGenerationServiceServer()
 }
 
-func RegisterPromptServiceServer(s grpc.ServiceRegistrar, srv PromptServiceServer) {
-	// If the following call pancis, it indicates UnimplementedPromptServiceServer was
+func RegisterGenerationServiceServer(s grpc.ServiceRegistrar, srv GenerationServiceServer) {
+	// If the following call pancis, it indicates UnimplementedGenerationServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&PromptService_ServiceDesc, srv)
+	s.RegisterService(&GenerationService_ServiceDesc, srv)
 }
 
-func _PromptService_GenerateResponseStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _GenerationService_GenerateResponseStream_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GenerateResponseRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(PromptServiceServer).GenerateResponseStream(m, &grpc.GenericServerStream[GenerateResponseRequest, StreamResponse]{ServerStream: stream})
+	return srv.(GenerationServiceServer).GenerateResponseStream(m, &grpc.GenericServerStream[GenerateResponseRequest, StreamResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PromptService_GenerateResponseStreamServer = grpc.ServerStreamingServer[StreamResponse]
+type GenerationService_GenerateResponseStreamServer = grpc.ServerStreamingServer[StreamResponse]
 
-func _PromptService_GenerateRepsonseBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GenerationService_GenerateRepsonseBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GenerateResponseRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PromptServiceServer).GenerateRepsonseBatch(ctx, in)
+		return srv.(GenerationServiceServer).GenerateRepsonseBatch(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PromptService_GenerateRepsonseBatch_FullMethodName,
+		FullMethod: GenerationService_GenerateRepsonseBatch_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PromptServiceServer).GenerateRepsonseBatch(ctx, req.(*GenerateResponseRequest))
+		return srv.(GenerationServiceServer).GenerateRepsonseBatch(ctx, req.(*GenerateResponseRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PromptService_ServiceDesc is the grpc.ServiceDesc for PromptService service.
+// GenerationService_ServiceDesc is the grpc.ServiceDesc for GenerationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PromptService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "generation.PromptService",
-	HandlerType: (*PromptServiceServer)(nil),
+var GenerationService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "generation.GenerationService",
+	HandlerType: (*GenerationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GenerateRepsonseBatch",
-			Handler:    _PromptService_GenerateRepsonseBatch_Handler,
+			Handler:    _GenerationService_GenerateRepsonseBatch_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GenerateResponseStream",
-			Handler:       _PromptService_GenerateResponseStream_Handler,
+			Handler:       _GenerationService_GenerateResponseStream_Handler,
 			ServerStreams: true,
 		},
 	},

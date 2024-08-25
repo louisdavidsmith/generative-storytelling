@@ -8,11 +8,11 @@ import (
 )
 
 type MistralGenerator struct {
-	Client  *mistral.NewMistralClientDefault
+	Client  *mistral.MistralClient
 	ModelId string
 }
 
-func convertChatToChatMessage(chat *pb.Chat) *ChatMessage {
+func convertChatToChatMessage(chat *pb.Chat) mistral.ChatMessage {
 	role := ""
 	switch chat.Role {
 	case pb.Role_USER:
@@ -25,14 +25,14 @@ func convertChatToChatMessage(chat *pb.Chat) *ChatMessage {
 		log.Fatalf("Unknown role: %d", chat.Role)
 	}
 
-	return &ChatMessage{
+	return mistral.ChatMessage{ // Remove the pointer here
 		Role:    role,
 		Content: chat.Content,
 	}
 }
 
-func convertChatsToChatMessages(chatList []*pb.Chat) []*ChatMessage {
-	chatMessages := make([]*ChatMessage, len(chatList))
+func convertChatsToChatMessages(chatList []*pb.Chat) []mistral.ChatMessage {
+	chatMessages := make([]mistral.ChatMessage, len(chatList)) // Change the type of the slice
 	for i, chat := range chatList {
 		chatMessages[i] = convertChatToChatMessage(chat)
 	}
@@ -41,8 +41,8 @@ func convertChatsToChatMessages(chatList []*pb.Chat) []*ChatMessage {
 
 func (m *MistralGenerator) GenerateResponseStream(req *pb.GenerateResponseRequest, stream pb.GenerationService_GenerateResponseStreamServer) error {
 	log.Printf("Received request: %v", req)
-	chatInput = convertChatsToChatMessages(req.Chat)
-	chatResChan, err := client.ChatStream(m.ModelId, chatInput, nil)
+	chatInput := convertChatsToChatMessages(req.Chat)
+	chatResChan, err := m.Client.ChatStream(m.ModelId, chatInput, nil)
 	if err != nil {
 		log.Fatalf("Error getting chat completion stream: %v", err)
 	}
@@ -50,23 +50,22 @@ func (m *MistralGenerator) GenerateResponseStream(req *pb.GenerateResponseReques
 		if chatResChunk.Error != nil {
 			log.Fatalf("Error while streaming response: %v", chatResChunk.Error)
 		}
-		stream.Send(&pb.StreamResponse{Token: chatResChunk})
-
+		stream.Send(&pb.StreamResponse{Token: chatResChunk.Choices[0].Delta.Content})
 	}
 	return nil
 }
 
 func (m *MistralGenerator) GenerateResponseBatch(ctx context.Context, req *pb.GenerateResponseRequest) (*pb.BatchResponse, error) {
 	log.Printf("Received request: %v", req)
-	chatInput = convertChatsToChatMessages(req.Chat)
-	chatRes, err := client.Chat(m.ModelId, chatInput, nil)
+	chatInput := convertChatsToChatMessages(req.Chat)
+	chatRes, err := m.Client.Chat(m.ModelId, chatInput, nil)
 	if err != nil {
 		log.Fatalf("Error getting chat completion: %v", err)
 	}
-	return &pb.BatchResponse{Response: chatRes}, nil
+	return &pb.BatchResponse{Response: chatRes.Choices[0].Message.Content}, nil
 }
 
-func NewMistralGenerator(client *mistral.NewMistralClientDefault, modelId string) *MistralGenerator {
+func NewMistralGenerator(client *mistral.MistralClient, modelId string) *MistralGenerator {
 	return &MistralGenerator{
 		Client:  client,
 		ModelId: modelId,
