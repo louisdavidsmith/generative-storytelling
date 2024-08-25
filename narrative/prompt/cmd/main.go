@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	pb "prompt/pkg/proto/prompt"
+	"prompt/pkg/truncate"
 )
 
 type Config struct {
@@ -23,21 +24,21 @@ type server struct {
 }
 
 func LoadConfig() (*Config, error) {
-	PromptPortStr := os.Getenv("NARRATIVE_PROMPT_PORT")
-	PromptPort, err := strconv.Atoi(PromptPortStr)
+	promptPortStr := os.Getenv("NARRATIVE_PROMPT_PORT")
+	promptPort, err := strconv.Atoi(promptPortStr)
 
 	if err != nil {
 		return nil, fmt.Errorf("NARRATIVE_PROMPT_PORT environment variable not set or not an integer")
 	}
 
-	MaxTokensStr := os.Getenv("MAX_CONVESATION_HISTORY_TOKENS")
-	MaxTokens, err := strconv.Atoi(MaxTokensStr)
+	maxTokensStr := os.Getenv("MAX_CONVESATION_HISTORY_TOKENS")
+	maxTokens, err := strconv.Atoi(maxTokensStr)
 	if err != nil {
 		return nil, fmt.Errorf("MAX_CONVESATION_HISTORY_TOKENS environment variable not set or not an integer")
 	}
 	config := &Config{
-		NarrativePromptPort:          PromptPort,
-		MaxConversationHistoryTokens: MaxTokens,
+		NarrativePromptPort:          promptPort,
+		MaxConversationHistoryTokens: maxTokens,
 	}
 
 	return config, nil
@@ -67,8 +68,10 @@ func (s *server) GetNarrationPrompt(ctx context.Context, req *pb.GetNarrationPro
 		Content: formattedUserPrompt,
 		Role:    pb.Role_USER,
 	}
+	truncatedChatHistory := truncate.TruncateConversationHistory(req.ChatHistory, s.Config.MaxConversationHistoryTokens)
+
 	prompt := &pb.Prompt{
-		Prompt: append([]*pb.Chat{systemChat}, append(req.ChatHistory, userChat)...),
+		Prompt: append([]*pb.Chat{systemChat}, append(truncatedChatHistory, userChat)...),
 	}
 
 	return prompt, nil
@@ -88,8 +91,9 @@ func (s *server) GetSkillCheckResolutionPrompt(ctx context.Context, req *pb.GetS
 		Role:    pb.Role_USER,
 	}
 
+	truncatedChatHistory := truncate.TruncateConversationHistory(req.ChatHistory, s.Config.MaxConversationHistoryTokens)
 	prompt := &pb.Prompt{
-		Prompt: append(req.ChatHistory, skillChat),
+		Prompt: append(truncatedChatHistory, skillChat),
 	}
 	return prompt, nil
 }
@@ -110,9 +114,9 @@ func (s *server) GetInsanityNarration(ctx context.Context, req *pb.GetSanityNarr
 		Content: formattedSanityPrompt,
 		Role:    pb.Role_USER,
 	}
-
+	truncatedChatHistory := truncate.TruncateConversationHistory(req.ChatHistory, s.Config.MaxConversationHistoryTokens)
 	prompt := &pb.Prompt{
-		Prompt: append(req.ChatHistory, sanityChat),
+		Prompt: append(truncatedChatHistory, sanityChat),
 	}
 
 	return prompt, nil
