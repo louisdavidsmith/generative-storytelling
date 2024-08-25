@@ -1,3 +1,5 @@
+package dummy
+
 import (
 	"context"
 	pb "generation/pkg/proto/generation"
