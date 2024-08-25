@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package generation;
+
+option go_package = "proto/generation";
+
+enum Role {
+  USER = 0;
+  ASSISTANT = 1;
+  SYSTEM = 2;
+}
+
+service PromptService {
+  rpc GenerateResponseStream(GenerateResponseRequest) returns (stream StreamResponse);
+  rpc GenerateRepsonseBatch(GenerateResponseRequest) returns (BatchResponse);
+}
+
+message Chat {
+  string content = 1;
+  Role role = 2;
+}
+
+message GenerateResponseRequest {
+  repeated Chat chat = 1;
+  string model_id = 2;
+}
+message StreamResponse {
+  string token = 1;
+}
+
+message BatchResponse {
+  string response = 2;
+}
