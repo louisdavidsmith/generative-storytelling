@@ -22,7 +22,7 @@ k8s_resource(
 
 k8s_resource(
   workload="minio",
-  port_forwards='9001:9001',
+  port_forwards=['9000:9000','9001:9001'],
   labels='datastore'
 )
 
@@ -35,9 +35,17 @@ dockerfile='deploy/docker/Dockerfile.datastore.ingestion',
 )
 
 k8s_resource(
-  workload="lore-initial-job",
+  workload="datastore-ingestion",
   labels="datastore",
   resource_deps=["postgres", "db-migrations", "text-embeddings-deployment"]
+)
+
+# rabbit mq
+
+k8s_resource(
+  workload="rabbitmq",
+  labels="rabbitmq",
+  port_forwards="5672:5672"
 )
 
 
@@ -53,6 +61,18 @@ k8s_resource(
   workload='narrative-prompt',
   labels='narrative',
   port_forwards=["50051:50051"]
+)
+
+docker_build(
+'narrative-generation',
+'.',
+dockerfile='deploy/docker/Dockerfile.narrative.generation'
+)
+
+k8s_resource(
+  workload='narrative-generation',
+  labels='narrative',
+  port_forwards=["50002:50002"]
 )
 
 # embeddings

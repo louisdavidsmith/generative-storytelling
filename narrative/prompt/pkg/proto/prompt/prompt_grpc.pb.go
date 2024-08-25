@@ -27,8 +27,6 @@ const (
 // PromptServiceClient is the client API for PromptService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Service to manage chats
 type PromptServiceClient interface {
 	GetNarrationPrompt(ctx context.Context, in *GetNarrationPromptRequest, opts ...grpc.CallOption) (*Prompt, error)
 	GetSkillCheckResolutionPrompt(ctx context.Context, in *GetSkillCheckResolutionPromptRequest, opts ...grpc.CallOption) (*Prompt, error)
@@ -76,8 +74,6 @@ func (c *promptServiceClient) GetInsanityNarration(ctx context.Context, in *GetS
 // PromptServiceServer is the server API for PromptService service.
 // All implementations must embed UnimplementedPromptServiceServer
 // for forward compatibility.
-//
-// Service to manage chats
 type PromptServiceServer interface {
 	GetNarrationPrompt(context.Context, *GetNarrationPromptRequest) (*Prompt, error)
 	GetSkillCheckResolutionPrompt(context.Context, *GetSkillCheckResolutionPromptRequest) (*Prompt, error)
