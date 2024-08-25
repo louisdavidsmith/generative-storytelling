@@ -18,3 +18,6 @@ spec:
       - name: narrative-prompt
         image: narrative-prompt:latest
         command: ["./server"]
+        env:
+         - name: MAX_CONVESATION_HISTORY_TOKENS
+           value: "80000"

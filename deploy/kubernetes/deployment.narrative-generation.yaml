@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: narrative-generation
+  labels:
+    app: narrative-generation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: narrative-generation
+  template:
+    metadata:
+      labels:
+        app: narrative-generation
+    spec:
+      containers:
+      - name: narrative-generation
+        image: narrative-generation:latest
+        command: ["./server"]
+        env:
+         - name: GENERATOR_TYPE
+           value: "dummy"

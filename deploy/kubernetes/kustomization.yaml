@@ -6,11 +6,13 @@ resources:
   - service.postgres.yaml
   - service.text-embeddings.yaml
   - service.narrative-prompt.yaml
+  - service.narrative-generation.yaml
   - service.rabbitmq.yaml
   - service.minio.yaml
   - service.datastore-ingestion.yaml
   - deployment.text-embeddings.yaml
   - deployment.narrative-prompt.yaml
+  - deployment.narrative-generation.yaml
   - deployment.datastore-ingestion.yaml
   - deployment.minio.yaml
   - job.migration_v1.yaml
