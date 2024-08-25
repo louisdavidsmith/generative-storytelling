@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package query;
+
+option go_package = "proto/generation";
+
+service QueryService {
+  rpc CreateAdventure(CreateAdventureRequest) returns (CreateAdventureResponse);
+  rpc CreateAdventureLore(CreateAdventureLoreRequest) returns (CreateAdventureLoreResponse);
+  rpc CreateCharacter(CreateCharacterRequest) returns (CreateCharacterResponse);
+  rpc GetAdventureLore(GetAdventureLoreRequest) returns (GetAdventureLoreResponse);
+  rpc GetConversationHistory(GetConversationHistoryRequest) returns (GetConversationHistoryResponse);
+  rpc GetPlayerCharacteristics(GetPlayerCharacteristicsRequest) returns (GetPlayerCharacteristicsResponse);
+  rpc GetNarrativeState(GetNarrativeStateRequest) returns (GetNarrativeStateResponse);
+  rpc UpdateConversationHistory(UpdateConversationHistoryRequest) returns (UpdateConversationHistoryResponse);
+  rpc UpdatePlayerCharacteristics(UpdatePlayerCharacteristicsRequest) returns (UpdatePlayerCharacteristicsResponse);
+  rpc UpdateNarrativeState(UpdateNarrativeStateRequest) returns (UpdateNarrativeStateResponse);
+}
+
+enum Role {
+  USER = 0;
+  ASSISTANT = 1;
+  SYSTEM = 2;
+}
+
+message Chat {
+  string content = 1;
+  Role role = 2;
+}
+
+enum CharacterRole {
+ PC = 0;
+ NPC = 1;
+}
+
+enum PlayerCharacteristic {
+  PHYSICAL = 0;
+  WIT = 1;
+  SOCIAL = 2;
+  COMPOSURE = 3;
+  SANITY = 4;
+}
+
+message CreateAdventureRequest{
+  string adventure_name = 1;
+  string premise = 2;
+  string description = 3;
+}
+
+message CreateAdventureResponse{
+  string adventure_name = 1;
+  string adventure_id = 2;
+}
+
+message CreateAdventureLoreRequest{
+  string lore_name = 1;
+}
+
+message CreateAdventureLoreResponse{
+  string lore_name = 1;
+  string lore_id = 2;
+}
+
+message CharacterStats{
+  int32 sanity = 1;
+  int32 physical = 2;
+  int32 wit = 3;
+  int32 composure = 4;
+  int32 social = 5;
+}
+
+message CreateCharacterRequest{
+  string adventure_id = 1;
+  string character_name = 2;
+  CharacterRole character_role = 3;
+  CharacterStats statistics =4;
+  string description = 5;
+}
+
+message CreateCharacterResponse{
+  string character_name = 1;
+  string character_id = 2;
+}
+
+message GetAdventureLoreRequest{
+  string lore_id = 1;
+  string content = 2;
+}
+
+message GetAdventureLoreResponse{
+  string lore_id = 1;
+  string context = 2;
+}
+
+message GetConversationHistoryRequest{
+  string adventure_id = 1;
+  int32 max_response_lenght = 2;
+}
+
+message GetConversationHistoryResponse{
+  string adventure_id = 1;
+  repeated Chat history = 2;
+}
+
+message GetPlayerCharacteristicsRequest{
+  string adventure_id = 1;
+  string character_id = 2;
+}
+message GetPlayerCharacteristicsResponse{
+  string character_name = 1;
+  CharacterStats statistics = 2;
+}
+
+message GetNarrativeStateRequest{
+  string adventure_id = 1;
+}
+
+message GetNarrativeStateResponse{
+  string narrative_state = 1;
+}
+
+message UpdateConversationHistoryRequest{
+  string adventure_id = 1;
+  Chat chat = 2;
+}
+
+message UpdateConversationHistoryResponse{
+  string adventure_id = 1;
+}
+
+message UpdatePlayerCharacteristicsRequest{
+  string adventure_id = 1;
+  string character_id = 2;
+  PlayerCharacteristic characteristic = 3;
+  int32 characteristic_value = 4;
+}
+
+message UpdatePlayerCharacteristicsResponse{
+  string adventure_id = 1;
+  string character_id = 2;
+}
+
+message UpdateNarrativeStateRequest{
+  string adventure_id = 1;
+  string narrative_state =2;
+}
+
+message UpdateNarrativeStateResponse{
+  string adventure_id = 1;
+}
