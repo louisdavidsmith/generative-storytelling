@@ -99,20 +99,49 @@ func (s *server) GetAdventureLore(ctx context.Context, req *pb.GetAdventureLoreR
 }
 
 func (s *server) GetConversationHistory(ctx context.Context, req *pb.GetConversationHistoryRequest) (*pb.GetConversationHistoryResponse, error) {
-	// Implement the logic for retrieving conversation history here.
-	history := []*pb.Chat{
-		{Content: "Hello, this is a message.", Role: pb.Role_USER},
-		{Content: "Hello, this is the assistant.", Role: pb.Role_ASSISTANT},
+	sql := `
+		SELECT role, content
+		FROM narrative
+		WHERE game_id = $1
+		ORDER BY created_at ASC;
+	`
+
+	rows, err := s.Pool.Query(ctx, sql, req.GameId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
+	defer rows.Close()
+
+	history := []*pb.Chat{}
+	for rows.Next() {
+		var role string
+		var content string
+
+		if err := rows.Scan(&role, &content); err != nil {
+			return nil, fmt.Errorf("error scanning row: %w", err)
+		}
+
+		chat := &pb.Chat{
+			Content: content,
+			Role:    pb.Role(pb.Role_value[role]),
+		}
+
+		history = append(history, chat)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %w", err)
+	}
+
 	res := &pb.GetConversationHistoryResponse{
-		AdventureId: req.AdventureId,
-		History:     history,
+		GameId: req.GameId,
+		History: history,
 	}
+
 	return res, nil
 }
 
 func (s *server) GetPlayerCharacteristics(ctx context.Context, req *pb.GetPlayerCharacteristicsRequest) (*pb.GetPlayerCharacteristicsResponse, error) {
-	// Implement the logic for retrieving player characteristics here.
 	stats := &pb.CharacterStats{
 		Sanity:    100,
 		Physical:  100,
