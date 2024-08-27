@@ -12,101 +12,101 @@ import (
 )
 
 type server struct {
-	generation.UnimplementedQueryServiceServer
+	pb.UnimplementedQueryServiceServer
 	Pool *pgxpool.Pool
 }
 
-func (s *server) CreateAdventure(ctx context.Context, req *generation.CreateAdventureRequest) (*generation.CreateAdventureResponse, error) {
-	// Implement the logic for creating an adventure here.
-	res := &generation.CreateAdventureResponse{
+func (s *server) CreateAdventure(ctx context.Context, req *pb.CreateAdventureRequest) (*pb.CreateAdventureResponse, error) {
+
+	res := &pb.CreateAdventureResponse{
 		AdventureName: req.AdventureName,
 		AdventureId:   "12345", // Placeholder ID
 	}
 	return res, nil
 }
 
-func (s *server) CreateAdventureLore(ctx context.Context, req *generation.CreateAdventureLoreRequest) (*generation.CreateAdventureLoreResponse, error) {
+func (s *server) CreateAdventureLore(ctx context.Context, req *pb.CreateAdventureLoreRequest) (*pb.CreateAdventureLoreResponse, error) {
 	// Implement the logic for creating adventure lore here.
-	res := &generation.CreateAdventureLoreResponse{
+	res := &pb.CreateAdventureLoreResponse{
 		LoreName: req.LoreName,
 		LoreId:   "67890", // Placeholder ID
 	}
 	return res, nil
 }
 
-func (s *server) CreateCharacter(ctx context.Context, req *generation.CreateCharacterRequest) (*generation.CreateCharacterResponse, error) {
+func (s *server) CreateCharacter(ctx context.Context, req *pb.CreateCharacterRequest) (*pb.CreateCharacterResponse, error) {
 	// Implement the logic for creating a character here.
-	res := &generation.CreateCharacterResponse{
+	res := &pb.CreateCharacterResponse{
 		CharacterName: req.CharacterName,
 		CharacterId:   "abcde", // Placeholder ID
 	}
 	return res, nil
 }
 
-func (s *server) GetAdventureLore(ctx context.Context, req *generation.GetAdventureLoreRequest) (*generation.GetAdventureLoreResponse, error) {
+func (s *server) GetAdventureLore(ctx context.Context, req *pb.GetAdventureLoreRequest) (*pb.GetAdventureLoreResponse, error) {
 	// Implement the logic for retrieving adventure lore here.
-	res := &generation.GetAdventureLoreResponse{
+	res := &pb.GetAdventureLoreResponse{
 		LoreId:  req.LoreId,
 		Context: "Some context about the lore", // Placeholder context
 	}
 	return res, nil
 }
 
-func (s *server) GetConversationHistory(ctx context.Context, req *generation.GetConversationHistoryRequest) (*generation.GetConversationHistoryResponse, error) {
+func (s *server) GetConversationHistory(ctx context.Context, req *pb.GetConversationHistoryRequest) (*pb.GetConversationHistoryResponse, error) {
 	// Implement the logic for retrieving conversation history here.
-	history := []*generation.Chat{
-		{Content: "Hello, this is a message.", Role: generation.Role_USER},
-		{Content: "Hello, this is the assistant.", Role: generation.Role_ASSISTANT},
+	history := []*pb.Chat{
+		{Content: "Hello, this is a message.", Role: pb.Role_USER},
+		{Content: "Hello, this is the assistant.", Role: pb.Role_ASSISTANT},
 	}
-	res := &generation.GetConversationHistoryResponse{
+	res := &pb.GetConversationHistoryResponse{
 		AdventureId: req.AdventureId,
 		History:     history,
 	}
 	return res, nil
 }
 
-func (s *server) GetPlayerCharacteristics(ctx context.Context, req *generation.GetPlayerCharacteristicsRequest) (*generation.GetPlayerCharacteristicsResponse, error) {
+func (s *server) GetPlayerCharacteristics(ctx context.Context, req *pb.GetPlayerCharacteristicsRequest) (*pb.GetPlayerCharacteristicsResponse, error) {
 	// Implement the logic for retrieving player characteristics here.
-	stats := &generation.CharacterStats{
+	stats := &pb.CharacterStats{
 		Sanity:    100,
 		Physical:  100,
 		Wit:       100,
 		Composure: 100,
 		Social:    100,
 	}
-	res := &generation.GetPlayerCharacteristicsResponse{
+	res := &pb.GetPlayerCharacteristicsResponse{
 		CharacterName: req.CharacterId,
 		Statistics:    stats,
 	}
 	return res, nil
 }
 
-func (s *server) GetNarrativeState(ctx context.Context, req *generation.GetNarrativeStateRequest) (*generation.GetNarrativeStateResponse, error) {
+func (s *server) GetNarrativeState(ctx context.Context, req *pb.GetNarrativeStateRequest) (*pb.GetNarrativeStateResponse, error) {
 	// Implement the logic for retrieving the narrative state here.
-	res := &generation.GetNarrativeStateResponse{
+	res := &pb.GetNarrativeStateResponse{
 		NarrativeState: "This is the current narrative state",
 	}
 	return res, nil
 }
 
-func (s *server) UpdateConversationHistory(ctx context.Context, req *generation.UpdateConversationHistoryRequest) (*generation.UpdateConversationHistoryResponse, error) {
+func (s *server) UpdateConversationHistory(ctx context.Context, req *pb.UpdateConversationHistoryRequest) (*pb.UpdateConversationHistoryResponse, error) {
 	// Implement the logic for updating conversation history here.
-	res := &generation.UpdateConversationHistoryResponse{
+	res := &pb.UpdateConversationHistoryResponse{
 		AdventureId: req.AdventureId,
 	}
 	return res, nil
 }
 
-func (s *server) UpdatePlayerCharacteristics(ctx context.Context, req *generation.UpdatePlayerCharacteristicsRequest) (*generation.UpdatePlayerCharacteristicsResponse, error) {
-	res := &generation.UpdatePlayerCharacteristicsResponse{
+func (s *server) UpdatePlayerCharacteristics(ctx context.Context, req *pb.UpdatePlayerCharacteristicsRequest) (*pb.UpdatePlayerCharacteristicsResponse, error) {
+	res := &pb.UpdatePlayerCharacteristicsResponse{
 		AdventureId: req.AdventureId,
 		CharacterId: req.CharacterId,
 	}
 	return res, nil
 }
 
-func (s *server) UpdateNarrativeState(ctx context.Context, req *generation.UpdateNarrativeStateRequest) (*generation.UpdateNarrativeStateResponse, error) {
-	res := &generation.UpdateNarrativeStateResponse{
+func (s *server) UpdateNarrativeState(ctx context.Context, req *pb.UpdateNarrativeStateRequest) (*pb.UpdateNarrativeStateResponse, error) {
+	res := &pb.UpdateNarrativeStateResponse{
 		AdventureId: req.AdventureId,
 	}
 	return res, nil
@@ -125,7 +125,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	generation.RegisterQueryServiceServer(s, &server{dbpool})
+	pb.RegisterQueryServiceServer(s, &server{dbpool})
 
 	fmt.Println("Server is running on port 50053")
 	if err := s.Serve(lis); err != nil {
