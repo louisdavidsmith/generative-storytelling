@@ -4,7 +4,7 @@
 // - protoc             v5.27.3
 // source: proto/query.proto
 
-package generation
+package query
 
 import (
 	context "context"
