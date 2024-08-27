@@ -17,10 +17,13 @@ type server struct {
 }
 
 func (s *server) CreateAdventure(ctx context.Context, req *pb.CreateAdventureRequest) (*pb.CreateAdventureResponse, error) {
+	sql := `INSERT INTO adventure (adventure_id, lore_id, premise) VALUES ($1, $2, $3)`
+	_, err = pool.Exec(context.Background(), stmt, req.AdventureId, req.LoreId, req.Premise)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	res := &pb.CreateAdventureResponse{
-		AdventureName: req.AdventureName,
-		AdventureId:   "12345", // Placeholder ID
 	}
 	return res, nil
 }
