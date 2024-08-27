@@ -24,6 +24,7 @@ func (s *server) CreateAdventure(ctx context.Context, req *pb.CreateAdventureReq
 	}
 
 	res := &pb.CreateAdventureResponse{
+		AdventureId: req.AdventureName
 	}
 	return res, nil
 }
