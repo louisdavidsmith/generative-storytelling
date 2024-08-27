@@ -94,7 +94,7 @@ async def main(args: argparse.Namespace):
             )
             logger.info("DataIngested")
 
-    await queue.consume(process_message, no_ack=False)
+    await queue.consume(process_message, auto_ack=True)
 
     logger.info("Waiting for messages...")
     await asyncio.Future()  # Run forever
