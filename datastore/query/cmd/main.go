@@ -18,7 +18,7 @@ type server struct {
 
 func (s *server) CreateAdventure(ctx context.Context, req *pb.CreateAdventureRequest) (*pb.CreateAdventureResponse, error) {
 	sql := `INSERT INTO adventure (adventure_id, lore_id, premise) VALUES ($1, $2, $3)`
-	_, err = pool.Exec(context.Background(), stmt, req.AdventureId, req.LoreId, req.Premise)
+	_, err = pool.Exec(context.Background(), stmt, req.AdventureId, req.LoreId, req.Premise, req.AdventureName)
 	if err != nil {
 		log.Fatal(err)
 	}
