@@ -42,9 +42,10 @@ enum PlayerCharacteristic {
 }
 
 message CreateAdventureRequest{
-  string adventure_name = 1;
-  string premise = 2;
-  string description = 3;
+  string adventure_id = 1;
+  string adventure_name = 2;
+  string lore_id = 3;
+  string premise = 4;
 }
 
 message CreateAdventureResponse{
@@ -53,7 +54,9 @@ message CreateAdventureResponse{
 }
 
 message CreateAdventureLoreRequest{
-  string lore_name = 1;
+  string lore_id = 1;
+  string lore_name = 2;
+  string lore_description = 3;
 }
 
 message CreateAdventureLoreResponse{
