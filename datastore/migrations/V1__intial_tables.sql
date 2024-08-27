@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS character_stat (
 );
 
 CREATE TABLE IF NOT EXISTS lore (
-  lore_id UUID NOT NULL DEFAULT gen_random_uuid(),
+  lore_id UUID NOT NULL,
   description text NOT NULL,
   name VARCHAR(255) NOT NULL,
 )
