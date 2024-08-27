@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	pb "query/pkg/proto/query"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type server struct {
@@ -17,41 +17,83 @@ type server struct {
 }
 
 func (s *server) CreateAdventure(ctx context.Context, req *pb.CreateAdventureRequest) (*pb.CreateAdventureResponse, error) {
-	sql := `INSERT INTO adventure (adventure_id, lore_id, premise) VALUES ($1, $2, $3)`
-	_, err = pool.Exec(context.Background(), stmt, req.AdventureId, req.LoreId, req.Premise, req.AdventureName)
+	sql := `INSERT INTO adventure (adventure_id, lore_id, premise, adventure_name) VALUES ($1, $2, $3, $4)`
+	_, err = pool.Exec(context.Background(), sql, req.AdventureId, req.LoreId, req.Premise, req.AdventureName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	res := &pb.CreateAdventureResponse{
-		AdventureId: req.AdventureName
+		AdventureId: req.AdventureName,
 	}
 	return res, nil
 }
 
 func (s *server) CreateAdventureLore(ctx context.Context, req *pb.CreateAdventureLoreRequest) (*pb.CreateAdventureLoreResponse, error) {
-	// Implement the logic for creating adventure lore here.
+	sql := `INSERT INTO lore (lore_id, lore_name, lore_description) VALUES ($1, $2, $3, $4)`
+	_, err = pool.Exec(context.Background(), sql, req.LoreId, req.LoreName, req.LoreDescription)
+	if err != nil {
+		log.Fatal(err)
+	}
 	res := &pb.CreateAdventureLoreResponse{
-		LoreName: req.LoreName,
-		LoreId:   "67890", // Placeholder ID
+		LoreName: req.LoreId,
 	}
 	return res, nil
 }
 
 func (s *server) CreateCharacter(ctx context.Context, req *pb.CreateCharacterRequest) (*pb.CreateCharacterResponse, error) {
-	// Implement the logic for creating a character here.
+	sql := `INSERT INTO game_character (game_id, character_id, name, description) VALUES ($1, $2, $3, $4)`
+	_, err = pool.Exec(context.Background(), sql, req.GameId, req.CharacterId, req.Name, req.Description)
+	if err != nil {
+		log.Fatal(err)
+	}
+	statFields := []struct {
+		name  string
+		value int32
+	}{
+		{"sanity", stats.GetSanity()},
+		{"physical", stats.GetPhysical()},
+		{"wit", stats.GetWit()},
+		{"composure", stats.GetComposure()},
+		{"social", stats.GetSocial()},
+	}
+
+	for _, field := range statFields {
+		stmt := `INSERT INTO character_stat (game_id, character_id, characteristic, value) VALUES ($1, $2, $3, $4)`
+		_, err := pool.Exec(context.Background(), stmt, req.GameID, req.CharacterId, field.name, field.value)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	res := &pb.CreateCharacterResponse{
-		CharacterName: req.CharacterName,
-		CharacterId:   "abcde", // Placeholder ID
+		CharacterId: req.CharacterId,
 	}
 	return res, nil
 }
 
 func (s *server) GetAdventureLore(ctx context.Context, req *pb.GetAdventureLoreRequest) (*pb.GetAdventureLoreResponse, error) {
-	// Implement the logic for retrieving adventure lore here.
+	sql := query := `
+		SELECT content
+		FROM (
+			SELECT lore_content_id, content, embedding,
+				   embedding <#> \$2::vector AS cosine_similarity
+			FROM lore_content
+			WHERE lore_id = \$1
+		) AS subquery
+		ORDER BY cosine_similarity DESC
+		LIMIT 1;`
+	row := pool.QueryRow(context.Background(), sql, rqd.LoreID, req.Embedding)
+	var content string
+	err = row.Scan(&content)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			fmt.Println("No matching lore content found")
+		} else {
+			log.Fatal(err)
+		}
 	res := &pb.GetAdventureLoreResponse{
 		LoreId:  req.LoreId,
-		Context: "Some context about the lore", // Placeholder context
+		Context: content
 	}
 	return res, nil
 }
@@ -135,3 +177,4 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
+}
